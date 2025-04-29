@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Tienda - Tierra & Calma</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="logo">Tierra & Calma</h1>
+        <nav class="nav">
+            <a href="../index.html">Inicio</a>
+            <a href="tienda.html" class="active">Tienda</a>
+            <a href="nosotros.html">Nosotros</a>
+            <a href="contacto.html">Contacto</a>
+        </nav>
+    </header>
+
+    <!-- Encabezado de tienda -->
+    <section class="contenido">
+        <div class="texto-ancho">
+            <h3>Nuestra Colección</h3>
+            <p>Explorá nuestras creaciones que combinan calidez, naturaleza y diseño.</p>
+            <div class="filtros-buscador">
+                <input type="text" placeholder="Buscar producto..." class="buscador" />
+                <select class="filtro">
+                    <option value="">Filtrar por categoría</option>
+                    <option value="velas">Velas</option>
+                    <option value="tazas">Tazas</option>
+                    <option value="textiles">Textiles</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Productos -->
+        <div class="valores-grid">
+            <div class="valor-card" data-categoria="velas">
+                <img src="https://source.unsplash.com/400x400/?candle" alt="Vela aromática"
+                    style="width:100%; border-radius: 1rem;">
+                <h4>Vela Natural</h4>
+                <p>$4.500</p>
+                <button>Agregar al carrito</button>
+            </div>
+            <div class="valor-card" data-categoria="tazas">
+                <img src="https://source.unsplash.com/400x400/?mug" alt="Taza boho"
+                    style="width:100%; border-radius: 1rem;">
+                <h4>Taza Bohemia</h4>
+                <p>$3.200</p>
+                <button>Agregar al carrito</button>
+            </div>
+            <div class="valor-card" data-categoria="textiles">
+                <img src="https://source.unsplash.com/400x400/?pillow,boho" alt="Cojín decorativo"
+                    style="width:100%; border-radius: 1rem;">
+                <h4>Cojín Rústico</h4>
+                <p>$5.000</p>
+                <button>Agregar al carrito</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2025 Tierra & Calma</p>
+        <div class="social">
+            <a href="#">Instagram</a>
+            <a href="#">Whatsapp</a>
+            <a href="#">Email</a>
+        </div>
+    </footer>
+
+    <!-- Carrito -->
+    <div id="carrito" class="carrito oculto">
+        <div class="carrito-header">
+            <h4>Tu carrito</h4>
+            <button id="cerrarCarrito">✖</button>
+        </div>
+        <div id="carrito-items" class="carrito-items">
+            <p>Tu carrito está vacío.</p>
+        </div>
+        <div class="carrito-footer" style="border-top: 1px solid #ccc; padding: 1rem;">
+            <p id="total" style="font-weight: bold; margin-bottom: 1rem;">Total: $0</p>
+            <button id="vaciarCarrito">Vaciar</button>
+            <button id="finalizarCompra">Finalizar compra</button>
+            <div class="carrito-footer">
+                <p>Total: $<span id="carrito-total">0</span></p>
+                <button class="boton-comprar" onclick="finalizarCompra()">Comprar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón flotante -->
+    <div id="icono-carrito">
+        <i class="fa fa-shopping-cart"></i>
+        <span id="carrito-cantidad">0</span>
+    </div>
+
+    <!-- Script -->
+    <script>
+        const cerrarBtn = document.getElementById("cerrarCarrito");
+        const carrito = document.getElementById("carrito");
+        const items = document.getElementById("carrito-items");
+        const total = document.getElementById("total");
+        const vaciarBtn = document.getElementById("vaciarCarrito");
+        const finalizarBtn = document.getElementById("finalizarCompra");
+        const carritoCantidad = document.getElementById("carrito-cantidad");
+        const iconoCarrito = document.getElementById("icono-carrito");
+
+        let carritoProductos = JSON.parse(localStorage.getItem("carrito")) || [];
+
+        iconoCarrito.addEventListener("click", () => carrito.classList.toggle("visible"));
+        cerrarBtn.addEventListener("click", () => carrito.classList.remove("visible"));
+
+        document.querySelectorAll(".valor-card button").forEach(boton => {
+            boton.addEventListener("click", () => {
+                const producto = boton.parentElement;
+                const nombre = producto.querySelector("h4").textContent;
+                const precio = parseFloat(producto.querySelector("p").textContent.replace("$", "").replace(".", ""));
+                agregarProducto(nombre, precio);
+            });
+        });
+
+        vaciarBtn.addEventListener("click", () => {
+            carritoProductos = [];
+            guardarCarrito();
+            renderizarCarrito();
+        });
+
+        finalizarBtn.addEventListener("click", () => {
+            if (carritoProductos.length === 0) {
+                alert("Tu carrito está vacío. Agregá productos para continuar.");
+                return;
+            }
+            alert("¡Gracias por tu compra! Te contactaremos pronto para coordinar la entrega. 🌿");
+            carritoProductos = [];
+            guardarCarrito();
+            renderizarCarrito();
+            window.location.href = "gracias.html";
+        });
+
+        function agregarProducto(nombre, precio) {
+            const existe = carritoProductos.find(p => p.nombre === nombre);
+            if (existe) {
+                existe.cantidad += 1;
+            } else {
+                carritoProductos.push({ nombre, precio, cantidad: 1 });
+            }
+            guardarCarrito();
+            renderizarCarrito();
+        }
+
+        function eliminarProducto(nombre) {
+            carritoProductos = carritoProductos.filter(p => p.nombre !== nombre);
+            guardarCarrito();
+            renderizarCarrito();
+        }
+
+        function guardarCarrito() {
+            localStorage.setItem("carrito", JSON.stringify(carritoProductos));
+        }
+
+        function renderizarCarrito() {
+            if (carritoProductos.length === 0) {
+                items.innerHTML = "<p>Tu carrito está vacío.</p>";
+                total.textContent = "Total: $0";
+                carritoCantidad.textContent = "0";
+                return;
+            }
+            carrito.classList.add("visible");
+            carrito.classList.remove("oculto");
+            items.innerHTML = carritoProductos.map(p => `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <span><strong>${p.nombre}</strong> x${p.cantidad} - $${(p.precio * p.cantidad).toLocaleString("es-AR")}</span>
+                    <button class="eliminar-btn" data-nombre="${p.nombre}" style="background: none; border: none; font-size: 16px; cursor: pointer;">❌</button>
+                </div>
+            `).join("");
+            const totalCompra = carritoProductos.reduce((acc, p) => acc + (p.precio * p.cantidad), 0);
+            total.textContent = `Total: $${totalCompra.toLocaleString("es-AR")}`;
+            carritoCantidad.textContent = carritoProductos.reduce((acc, p) => acc + p.cantidad, 0);
+            document.querySelectorAll(".eliminar-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const nombre = btn.getAttribute("data-nombre");
+                    eliminarProducto(nombre);
+                });
+            });
+        }
+
+        // === FILTRO Y BUSCADOR ===
+        const filtroSelect = document.querySelector(".filtro");
+        const buscadorInput = document.querySelector(".buscador");
+
+        filtroSelect.addEventListener("change", filtrarYBuscarProductos);
+        buscadorInput.addEventListener("input", filtrarYBuscarProductos);
+
+        function filtrarYBuscarProductos() {
+            const categoria = filtroSelect.value.toLowerCase();
+            const texto = buscadorInput.value.toLowerCase();
+            const productos = document.querySelectorAll(".valor-card");
+
+            productos.forEach(producto => {
+                const nombre = producto.querySelector("h4").textContent.toLowerCase();
+                const cat = producto.getAttribute("data-categoria").toLowerCase();
+
+                const coincideCategoria = !categoria || cat === categoria;
+                const coincideBusqueda = !texto || nombre.includes(texto);
+
+                if (coincideCategoria && coincideBusqueda) {
+                    producto.style.display = "block";
+                } else {
+                    producto.style.display = "none";
+                }
+            });
+        }
+
+        renderizarCarrito();
+    </script>
+</body>
+
+</html>
